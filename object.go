@@ -21,13 +21,13 @@ type Object struct {
 	Type string
 }
 
-func GetObject(sha string) (*Object, error) {
-	r, err := os.Open(fmt.Sprintf("%s/objects/%s/%s", home, sha[:2], sha[2:]))
+func (r *Repository) GetObject(sha string) (*Object, error) {
+	f, err := os.Open(fmt.Sprintf("%s/objects/%s/%s", r.dir, sha[:2], sha[2:]))
 	if err != nil {
 		return nil, err
 	}
 
-	z, err := zlib.NewReader(r)
+	z, err := zlib.NewReader(f)
 	if err != nil {
 		return nil, err
 	}
@@ -42,17 +42,17 @@ func GetObject(sha string) (*Object, error) {
 	return &Object{SHA: sha, Body: body, Type: type_}, nil
 }
 
-func WriteObject(r []byte, type_ string) (string, error) {
-	prefix := append([]byte(fmt.Sprintf("%s %d", type_, len(r))), []byte{'\000'}...)
-	raw := append(prefix, r...)
+func (r *Repository) WriteObject(b []byte, type_ string) (string, error) {
+	prefix := append([]byte(fmt.Sprintf("%s %d", type_, len(b))), []byte{'\000'}...)
+	raw := append(prefix, b...)
 	sha := hash(raw)
 
-	objD := fmt.Sprintf("%s/objects/%s", home, sha[:2])
+	objD := fmt.Sprintf("%s/objects/%s", r.dir, sha[:2])
 	if _, err := os.Stat(objD); os.IsNotExist(err) {
 		os.Mkdir(objD, os.ModePerm)
 	}
 
-	objF := fmt.Sprintf("%s/objects/%s/%s", home, sha[:2], sha[2:])
+	objF := fmt.Sprintf("%s/objects/%s/%s", r.dir, sha[:2], sha[2:])
 	if _, err := os.Stat(objF); os.IsNotExist(err) {
 		wF, err := os.Create(objF)
 		checkErr(err)
