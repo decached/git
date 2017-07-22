@@ -16,6 +16,14 @@ type Repository struct {
 	dir string
 }
 
+func GetRepository() (*Repository, error) {
+	default_dir, _ := filepath.Abs("./.git")
+	base_dir := getenv("GIT_DIR", default_dir)
+	return &Repository{
+		dir: base_dir,
+	}, nil
+}
+
 func Init() (*Repository, error) {
 	base_dir := getenv("GIT_DIR", ".git")
 
