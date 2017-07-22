@@ -64,7 +64,7 @@ func Init() (*Repository, error) {
 	}
 
 	r := &Repository{dir: dir}
-	r.Checkout("master")
+	r.Checkout("master", nil)
 
 	return r, nil
 }
