@@ -17,18 +17,26 @@ var want_sha = "ab14967724c94d1d5c29ba16bd4505997f07b392"
 var want_type = "blob"
 
 func TestGetObject(t *testing.T) {
+	r := Setup("TestGetObject")
+	defer TearDown("TestGetObject")
+
+	r.WriteObject(want_body, want_type)
+
 	want := &Object{
 		SHA:  want_sha,
 		Body: want_body,
 		Type: want_type,
 	}
-	got, _ := GetObject("ab14967724c94d1d5c29ba16bd4505997f07b392")
+	got, _ := r.GetObject(want_sha)
 	assert(*got, *want, t)
 }
 
 func TestWriteObject(t *testing.T) {
-	got_sha, _ := WriteObject(want_body, want_type)
-	got, _ := GetObject(want_sha)
+	r := Setup("TestWriteObject")
+	defer TearDown("TestWriteObject")
+
+	got_sha, _ := r.WriteObject(want_body, want_type)
+	got, _ := r.GetObject(want_sha)
 	assert(got_sha, want_sha, t)
 	assert(got.Body, want_body, t)
 }
