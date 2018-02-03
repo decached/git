@@ -8,8 +8,11 @@
 package git
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
+	"reflect"
+	"testing"
 )
 
 var test_dir, _ = filepath.Abs("./tmp")
@@ -25,4 +28,11 @@ func Setup(testDir string) *Repository {
 func TearDown(testDir string) {
 	path, _ := filepath.Abs(testDir)
 	os.RemoveAll(path)
+}
+
+// Test Helpers
+func assert(got interface{}, want interface{}, t *testing.T) {
+	if !reflect.DeepEqual(got, want) {
+		t.Error(fmt.Sprintf("Want %s, Got %s", want, got))
+	}
 }
